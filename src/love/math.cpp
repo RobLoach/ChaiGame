@@ -1,11 +1,9 @@
 #include "math.h"
-#include "effolkronium/random.hpp"
-
-using Random = effolkronium::random_static;
 
 namespace love {
 
-bool math::load() {
+bool math::load(pntr_app* application) {
+	app = application;
 	return true;
 }
 
@@ -18,7 +16,7 @@ float math::random(float max) {
 }
 
 float math::random(float min, float max) {
-	return Random::get<float>(min, max);
+	return pntr_app_random_float(app, min, max);
 }
 
 int math::random(int max) {
@@ -26,14 +24,15 @@ int math::random(int max) {
 }
 
 int math::random(int min, int max) {
-	return Random::get<int>(min, max);
-}
-double math::random(double max) {
-	return random(0.0, max);
+	return pntr_app_random(app, min, max);
 }
 
 double math::random(double min, double max) {
-	return Random::get<double>(min, max);
+	return (double)pntr_app_random_float(app, (float)min, (float)max);
+}
+
+double math::random(double max) {
+	return (double)pntr_app_random_float(app, 0.0f, (float)max);
 }
 
 math& math::setRandomSeed(int min, int max) {
@@ -41,13 +40,12 @@ math& math::setRandomSeed(int min, int max) {
 }
 
 math& math::setRandomSeed(int seed) {
-	Random::seed(seed);
-	m_seed = seed;
+	pntr_app_random_set_seed(app, seed);
 	return *this;
 }
 
 int math::getRandomSeed() {
-	return m_seed;
+	return (int)pntr_app_random_seed(app);
 }
 
 float math::rad(float degress) {

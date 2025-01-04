@@ -5,7 +5,7 @@
 #include <vector>
 
 #include "Types/Input/Joystick.h"
-#include "SDL.h"
+#include "pntr_app.h"
 
 using love::Types::Input::Joystick;
 

@@ -4,6 +4,8 @@
 #include <string>
 #include "audio/audio_mixer.h"
 
+#include "pntr_app.h"
+
 namespace love {
 namespace Types {
 namespace Audio {
@@ -30,33 +32,6 @@ class SoundData {
 	bool isLoaded();
 
 	/**
-	 * Gets the current volume of the Source.
-	 *
-	 * @return The volume of the source, from 0.0f to 1.0f.
-	 *
-	 * @see setVolume
-	 */
-	float getVolume();
-
-	/**
-	 * Sets the current volume of the Source.
-	 *
-	 * @param volume The volume to set the source at, from 0.0f to 1.0f.
-	 *
-	 * @return The SoundData object iself, to allow for method chaining.
-	 *
-	 * @see getVolume
-	 */
-	SoundData& setVolume(float volume);
-
-	/**
-	 * Returns whether the Source is playing.
-	 *
-	 * @return True if the sound is playing.
-	 */
-	bool isPlaying();
-
-	/**
 	 * Returns whether the Source will loop.
 	 *
 	 * @see setLooping
@@ -70,17 +45,8 @@ class SoundData {
 	 */
 	SoundData& setLooping(bool loop);
 
-	// The audio callback for when a sound finishes.
-	static void audioCallback(audio_mixer_sound_t* sound, unsigned reason);
-
-	// Properties
-	bool m_playing = false;
-	bool m_loop = false;
-	float m_volume = 1.0f;
-	void* buffer = NULL;
-	audio_mixer_sound* m_sound = NULL;
-	// TODO(RobLoach): Make voice a vector?
-	audio_mixer_voice_t* m_voice = NULL;
+	pntr_sound* m_sound;
+	bool m_loop;
 };
 
 }  // namespace Audio

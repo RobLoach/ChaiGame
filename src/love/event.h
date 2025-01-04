@@ -1,8 +1,6 @@
 #ifndef SRC_LOVE_EVENT_H_
 #define SRC_LOVE_EVENT_H_
 
-#include <SDL.h>
-
 namespace love {
 /**
  * Manages events, like keypresses.

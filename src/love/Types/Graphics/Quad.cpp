@@ -1,5 +1,5 @@
 #include "Quad.h"
-#include "SDL.h"
+#include "pntr_app.h"
 
 namespace love {
 namespace Types {
@@ -18,12 +18,12 @@ Quad::Quad() {
 	// Nothing.
 }
 
-SDL_Rect Quad::toRect() {
-	SDL_Rect rect;
+pntr_rectangle Quad::toRect() {
+	pntr_rectangle rect;
 	rect.x = x;
 	rect.y = y;
-	rect.w = width;
-	rect.h = height;
+	rect.width = width;
+	rect.height = height;
 	return rect;
 }
 

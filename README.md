@@ -108,12 +108,20 @@ make docs
 The following individuals contributed to ChaiLove in some way:
 
 - [@RobLoach](http://github.com/robloach)
+- [@phcoder](https://github.com/phcoder) for the many builtbot fixes
 - [@webgeek1234](http://github.com/webgeek1234) for the Android support
-- [@r-type](https://github.com/r-type) for his work on [sdl-libretro](https://github.com/r-type/sdl-libretro)
-- [@mudlord](https://github.com/mudlord) for his work on the [libretro-common](https://github.com/libretro/libretro-common) audio system
+- [@r-type](https://github.com/r-type) for [sdl-libretro](https://github.com/r-type/sdl-libretro)
+- [@mudlord](https://github.com/mudlord) for the [libretro-common](https://github.com/libretro/libretro-common) audio system
 - [@orbea](http://github.com/orbea)
 - [@fetzerch](http://github.com/fetzerch)
 - [@bparker06](https://github.com/bparker06)
 - [@twinaphex](http://github.com/twinaphex)
 - [@ToKe79](https://github.com/ToKe79)
+- [@konsumer](https://github.com/konsumer)
 - [@baxysquare](https://github.com/baxysquare) for the [Logo](docs/chailove.png)
+
+And many others!
+
+## License
+
+[MIT](COPYING)

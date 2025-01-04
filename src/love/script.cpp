@@ -1,6 +1,5 @@
 #include "script.h"
 #include "../ChaiLove.h"
-#include "../LibretroLog.h"
 #include <algorithm>
 
 #ifdef __HAVE_CHAISCRIPT__
@@ -14,7 +13,7 @@ using love::Types::Graphics::Point;
 using love::Types::Graphics::Image;
 using love::Types::Graphics::Font;
 using love::Types::Graphics::Point;
-using love::Types::Graphics::Color;
+//using love::Types::Graphics::Color;
 using love::Types::Input::Joystick;
 using love::Types::Config::WindowConfig;
 using love::Types::Config::ModuleConfig;
@@ -51,14 +50,14 @@ bool script::loadModule(const std::string& moduleName) {
 
 	// Ensure we're loading a valid module name.
 	if (moduleName.empty()) {
-		LibretroLog::log(RETRO_LOG_ERROR) << "[ChaiLove] [script] loadModule was called with an empty moduleName." << std::endl;
+		//LibretroLog::log(RETRO_LOG_ERROR) << "[ChaiLove] [script] loadModule was called with an empty moduleName." << std::endl;
 		return false;
 	}
 
 	// Store a filename for the module.
 	std::string filename = findModule(moduleName);
 	if (filename.empty()) {
-		LibretroLog::log(RETRO_LOG_INFO) << "[ChaiLove] [script] Module " << moduleName << " not found." << std::endl;
+		//LibretroLog::log(RETRO_LOG_INFO) << "[ChaiLove] [script] Module " << moduleName << " not found." << std::endl;
 		return false;
 	}
 
@@ -67,7 +66,7 @@ bool script::loadModule(const std::string& moduleName) {
 
 	// Make sure it was not empty.
 	if (contents.empty()) {
-		LibretroLog::log(RETRO_LOG_ERROR) << "[ChaiLove] [script] Module " << filename << " was loaded, but empty." << std::endl;
+		//LibretroLog::log(RETRO_LOG_ERROR) << "[ChaiLove] [script] Module " << filename << " was loaded, but empty." << std::endl;
 		return false;
 	}
 
@@ -136,7 +135,6 @@ script::script(const std::string& file) {
 		ChaiLove* app = ChaiLove::getInstance();
 		love["audio"] = var(std::ref(app->audio));
 		love["config"] = var(std::ref(app->config));
-		love["console"] = var(std::ref(app->console));
 		love["data"] = var(std::ref(app->data));
 		love["event"] = var(std::ref(app->event));
 		love["filesystem"] = var(std::ref(app->filesystem));
@@ -191,14 +189,14 @@ script::script(const std::string& file) {
 	chai.add(constructor<FileData(const std::string&)>(), "FileData");
 
 	// Color Object.
-	chai.add(user_type<Color>(), "Color");
-	chai.add(fun(&Color::r), "r");
-	chai.add(fun(&Color::g), "g");
-	chai.add(fun(&Color::b), "b");
-	chai.add(fun(&Color::a), "a");
-	chai.add(constructor<Color()>(), "Color");
-	chai.add(constructor<Color(int, int, int)>(), "Color");
-	chai.add(constructor<Color(int, int, int, int)>(), "Color");
+	// chai.add(user_type<Color>(), "Color");
+	// chai.add(fun(&Color::r), "r");
+	// chai.add(fun(&Color::g), "g");
+	// chai.add(fun(&Color::b), "b");
+	// chai.add(fun(&Color::a), "a");
+	// chai.add(constructor<Color()>(), "Color");
+	// chai.add(constructor<Color(int, int, int)>(), "Color");
+	// chai.add(constructor<Color(int, int, int, int)>(), "Color");
 
 	// Image Object.
 	chai.add(user_type<Image>(), "Image");
@@ -208,12 +206,12 @@ script::script(const std::string& file) {
 	// SoundData Object.
 	chai.add(user_type<SoundData>(), "SoundData");
 	chai.add(fun(&SoundData::isLooping), "isLooping");
-	chai.add(fun(&SoundData::isPlaying), "isPlaying");
+	//chai.add(fun(&SoundData::isPlaying), "isPlaying");
 	chai.add(fun(&SoundData::setLooping), "setLooping");
 	chai.add(fun(&SoundData::stop), "stop");
 	chai.add(fun(&SoundData::play), "play");
-	chai.add(fun(&SoundData::setVolume), "setVolume");
-	chai.add(fun(&SoundData::getVolume), "getVolume");
+	//chai.add(fun(&SoundData::setVolume), "setVolume");
+	//chai.add(fun(&SoundData::getVolume), "getVolume");
 
 	// Font.
 	chai.add(user_type<Font>(), "Font");
@@ -239,12 +237,6 @@ script::script(const std::string& file) {
 	chai.add(fun(&config::window), "window");
 	chai.add(fun(&config::modules), "modules");
 	chai.add(fun(&config::options), "options");
-	chai.add(fun(&config::console), "console");
-
-	// Console
-	chai.add(fun(&console::isEnabled), "isEnabled");
-	chai.add(fun(&console::setEnabled), "setEnabled");
-	chai.add(fun(&console::isShown), "isShown");
 
 	// Joystick
 	chai.add(user_type<Joystick>(), "Joystick");
@@ -402,8 +394,8 @@ script::script(const std::string& file) {
 	chai.add(fun<int, math, int, int>(&math::random), "random");
 	chai.add(fun<double, math, double>(&math::random), "random");
 	chai.add(fun<double, math, double, double>(&math::random), "random");
-	chai.add(fun<love::math&, math, int, int>(&math::setRandomSeed), "setRandomSeed");
 	chai.add(fun<love::math&, math, int>(&math::setRandomSeed), "setRandomSeed");
+	chai.add(fun<love::math&, math, int, int>(&math::setRandomSeed), "setRandomSeed");
 	chai.add(fun(&math::getRandomSeed), "getRandomSeed");
 
 	// Data
@@ -434,119 +426,119 @@ script::script(const std::string& file) {
 		chaiload = chai.eval<std::function<void()> >("load");
 	}
 	catch (const std::exception& e) {
-		LibretroLog::log(RETRO_LOG_ERROR) << "[ChaiLove] [script] load() " << e.what() << std::endl;
+		//LibretroLog::log(RETRO_LOG_ERROR) << "[ChaiLove] [script] load() " << e.what() << std::endl;
 		hasload = false;
 	}
 	try {
 		chaireset = chai.eval<std::function<void()> >("reset");
 	}
 	catch (const std::exception& e) {
-		LibretroLog::log(RETRO_LOG_INFO) << "[ChaiLove] [script] reset() " << e.what() << std::endl;
+		//LibretroLog::log(RETRO_LOG_INFO) << "[ChaiLove] [script] reset() " << e.what() << std::endl;
 		hasreset = false;
 	}
 	try {
 		chaiupdate = chai.eval<std::function<void(float)> >("update");
 	}
 	catch (const std::exception& e) {
-		LibretroLog::log(RETRO_LOG_INFO) << "[ChaiLove] [script] update(delta) " << e.what() << std::endl;
+		//LibretroLog::log(RETRO_LOG_INFO) << "[ChaiLove] [script] update(delta) " << e.what() << std::endl;
 		hasUpdate = false;
 	}
 	try {
 		chaiconf = chai.eval<std::function<void(config&)> >("conf");
 	}
 	catch (const std::exception& e) {
-		LibretroLog::log(RETRO_LOG_INFO) << "[ChaiLove] [script] conf(t) " << e.what() << std::endl;
+		//LibretroLog::log(RETRO_LOG_INFO) << "[ChaiLove] [script] conf(t) " << e.what() << std::endl;
 		hasconf = false;
 	}
 	try {
 		chaidraw = chai.eval<std::function<void()> >("draw");
 	}
 	catch (const std::exception& e) {
-		LibretroLog::log(RETRO_LOG_INFO) << "[ChaiLove] [script] draw() " << e.what() << std::endl;
+		//LibretroLog::log(RETRO_LOG_INFO) << "[ChaiLove] [script] draw() " << e.what() << std::endl;
 		hasDraw = false;
 	}
 	try {
 		chaijoystickpressed = chai.eval<std::function<void(int, const std::string&)> >("joystickpressed");
 	}
 	catch (const std::exception& e) {
-		LibretroLog::log(RETRO_LOG_INFO) << "[ChaiLove] [script] joystickpressed() " << e.what() << std::endl;
+		//LibretroLog::log(RETRO_LOG_INFO) << "[ChaiLove] [script] joystickpressed() " << e.what() << std::endl;
 		hasjoystickpressed = false;
 	}
 	try {
 		chaijoystickreleased = chai.eval<std::function<void(int, const std::string&)> >("joystickreleased");
 	}
 	catch (const std::exception& e) {
-		LibretroLog::log(RETRO_LOG_INFO) << "[ChaiLove] [script] joystickreleased() " << e.what() << std::endl;
+		//LibretroLog::log(RETRO_LOG_INFO) << "[ChaiLove] [script] joystickreleased() " << e.what() << std::endl;
 		hasjoystickreleased = false;
 	}
 	try {
 		chaimousepressed = chai.eval<std::function<void(int, int, const std::string&)> >("mousepressed");
 	}
 	catch (const std::exception& e) {
-		LibretroLog::log(RETRO_LOG_INFO) << "[ChaiLove] [script] mousepressed() " << e.what() << std::endl;
+		//LibretroLog::log(RETRO_LOG_INFO) << "[ChaiLove] [script] mousepressed() " << e.what() << std::endl;
 		hasmousepressed = false;
 	}
 	try {
 		chaimousereleased = chai.eval<std::function<void(int, int, const std::string&)> >("mousereleased");
 	}
 	catch (const std::exception& e) {
-		LibretroLog::log(RETRO_LOG_INFO) << "[ChaiLove] [script] mousereleased() " << e.what() << std::endl;
+		//LibretroLog::log(RETRO_LOG_INFO) << "[ChaiLove] [script] mousereleased() " << e.what() << std::endl;
 		hasmousereleased = false;
 	}
 	try {
 		chaimousemoved = chai.eval<std::function<void(int, int, int, int)> >("mousemoved");
 	}
 	catch (const std::exception& e) {
-		LibretroLog::log(RETRO_LOG_INFO) << "[ChaiLove] [script] mousemoved() " << e.what() << std::endl;
+		//LibretroLog::log(RETRO_LOG_INFO) << "[ChaiLove] [script] mousemoved() " << e.what() << std::endl;
 		hasmousemoved = false;
 	}
 	try {
 		chaikeypressed = chai.eval<std::function<void(const std::string&, int)> >("keypressed");
 	}
 	catch (const std::exception& e) {
-		LibretroLog::log(RETRO_LOG_INFO) << "[ChaiLove] [script] keypressed() " << e.what() << std::endl;
+		//LibretroLog::log(RETRO_LOG_INFO) << "[ChaiLove] [script] keypressed() " << e.what() << std::endl;
 		haskeypressed = false;
 	}
 	try {
 		chaikeyreleased = chai.eval<std::function<void(const std::string&, int)> >("keyreleased");
 	}
 	catch (const std::exception& e) {
-		LibretroLog::log(RETRO_LOG_INFO) << "[ChaiLove] [script] keyreleased() " << e.what() << std::endl;
+		//LibretroLog::log(RETRO_LOG_INFO) << "[ChaiLove] [script] keyreleased() " << e.what() << std::endl;
 		haskeyreleased = false;
 	}
 	try {
 		chailoadstate = chai.eval<std::function<bool(const std::string&)> >("loadstate");
 	}
 	catch (const std::exception& e) {
-		LibretroLog::log(RETRO_LOG_INFO) << "[ChaiLove] [script] loadstate() " << e.what() << std::endl;
+		//LibretroLog::log(RETRO_LOG_INFO) << "[ChaiLove] [script] loadstate() " << e.what() << std::endl;
 		hasloadstate = false;
 	}
 	try {
 		chaisavestate = chai.eval<std::function<std::string()> >("savestate");
 	}
 	catch (const std::exception& e) {
-		LibretroLog::log(RETRO_LOG_INFO) << "[ChaiLove] [script] savestate() " << e.what() << std::endl;
+		//LibretroLog::log(RETRO_LOG_INFO) << "[ChaiLove] [script] savestate() " << e.what() << std::endl;
 		hassavestate = false;
 	}
 	try {
 		chaicheatreset = chai.eval<std::function<void()> >("cheatreset");
 	}
 	catch (const std::exception& e) {
-		LibretroLog::log(RETRO_LOG_INFO) << "[ChaiLove] [script] cheatreset() Warning: " << e.what() << std::endl;
+		//LibretroLog::log(RETRO_LOG_INFO) << "[ChaiLove] [script] cheatreset() Warning: " << e.what() << std::endl;
 		hascheatreset = false;
 	}
 	try {
 		chaicheatset = chai.eval<std::function<void(int, bool, const std::string&)> >("cheatset");
 	}
 	catch (const std::exception& e) {
-		LibretroLog::log(RETRO_LOG_INFO) << "[ChaiLove] [script] cheatset() Warning: " << e.what() << std::endl;
+		//LibretroLog::log(RETRO_LOG_INFO) << "[ChaiLove] [script] cheatset() Warning: " << e.what() << std::endl;
 		hascheatset = false;
 	}
 	try {
 		chaiexit = chai.eval<std::function<void()> >("exit");
 	}
 	catch (const std::exception& e) {
-		LibretroLog::log(RETRO_LOG_INFO) << "[ChaiLove] [script] exit() Warning: " << e.what() << std::endl;
+		//LibretroLog::log(RETRO_LOG_INFO) << "[ChaiLove] [script] exit() Warning: " << e.what() << std::endl;
 		hasexit = false;
 	}
 	#endif
@@ -559,7 +551,7 @@ void script::conf(config& t) {
 			chaiconf(t);
 		}
 		catch (const std::exception& e) {
-			LibretroLog::log(RETRO_LOG_ERROR) << "[ChaiLove] [script] Failed to invoke conf(t): " << e.what() << std::endl;
+			//LibretroLog::log(RETRO_LOG_ERROR) << "[ChaiLove] [script] Failed to invoke conf(t): " << e.what() << std::endl;
 			hasconf = false;
 		}
 	}
@@ -573,7 +565,7 @@ void script::load() {
 			chaiload();
 		}
 		catch (const std::exception& e) {
-			LibretroLog::log(RETRO_LOG_ERROR) << "[ChaiLove] [script] Failed to call load(): " << e.what() << std::endl;
+			//LibretroLog::log(RETRO_LOG_ERROR) << "[ChaiLove] [script] Failed to call load(): " << e.what() << std::endl;
 			hasload = false;
 		}
 	}
@@ -587,7 +579,7 @@ void script::reset() {
 			chaireset();
 		}
 		catch (const std::exception& e) {
-			LibretroLog::log(RETRO_LOG_ERROR) << "[ChaiLove] [script] Failed to call reset(): " << e.what() << std::endl;
+			//LibretroLog::log(RETRO_LOG_ERROR) << "[ChaiLove] [script] Failed to call reset(): " << e.what() << std::endl;
 			hasreset = false;
 		}
 	}
@@ -602,7 +594,7 @@ void script::update(float delta) {
 		}
 		catch (const std::exception& e) {
 			hasUpdate = false;
-			LibretroLog::log(RETRO_LOG_ERROR) << "[ChaiLove] [script] Failed to call update(delta): " << e.what() << std::endl;
+			//LibretroLog::log(RETRO_LOG_ERROR) << "[ChaiLove] [script] Failed to call update(delta): " << e.what() << std::endl;
 		}
 	}
 	#endif
@@ -615,7 +607,7 @@ void script::draw() {
 			chaidraw();
 		}
 		catch (const std::exception& e) {
-			LibretroLog::log(RETRO_LOG_ERROR) << "[ChaiLove] [script] Failed to call draw(): " << e.what() << std::endl;
+			//LibretroLog::log(RETRO_LOG_ERROR) << "[ChaiLove] [script] Failed to call draw(): " << e.what() << std::endl;
 			hasDraw = false;
 		}
 	} else {
@@ -631,7 +623,7 @@ void script::joystickpressed(int joystick, const std::string& button) {
 			chaijoystickpressed(joystick, button);
 		}
 		catch (const std::exception& e) {
-			LibretroLog::log(RETRO_LOG_ERROR) << "[ChaiLove] [script] Failed to call joystickpressed(): " << e.what() << std::endl;
+			//LibretroLog::log(RETRO_LOG_ERROR) << "[ChaiLove] [script] Failed to call joystickpressed(): " << e.what() << std::endl;
 			hasjoystickpressed = false;
 		}
 	}
@@ -645,7 +637,7 @@ void script::joystickreleased(int joystick, const std::string& button) {
 			chaijoystickreleased(joystick, button);
 		}
 		catch (const std::exception& e) {
-			LibretroLog::log(RETRO_LOG_ERROR) << "[ChaiLove] [script] Failed to call joystickreleased(): " << e.what() << std::endl;
+			//LibretroLog::log(RETRO_LOG_ERROR) << "[ChaiLove] [script] Failed to call joystickreleased(): " << e.what() << std::endl;
 			hasjoystickreleased = false;
 		}
 	}
@@ -659,7 +651,7 @@ void script::mousepressed(int x, int y, const std::string& button) {
 			chaimousepressed(x, y, button);
 		}
 		catch (const std::exception& e) {
-			LibretroLog::log(RETRO_LOG_ERROR) << "[ChaiLove] [script] Failed to call mousepressed(): " << e.what() << std::endl;
+			//LibretroLog::log(RETRO_LOG_ERROR) << "[ChaiLove] [script] Failed to call mousepressed(): " << e.what() << std::endl;
 			hasmousepressed = false;
 		}
 	}
@@ -673,7 +665,7 @@ void script::mousereleased(int x, int y, const std::string& button) {
 			chaimousereleased(x, y, button);
 		}
 		catch (const std::exception& e) {
-			LibretroLog::log(RETRO_LOG_ERROR) << "[ChaiLove] [script] Failed to call mousereleased(): " << e.what() << std::endl;
+			//LibretroLog::log(RETRO_LOG_ERROR) << "[ChaiLove] [script] Failed to call mousereleased(): " << e.what() << std::endl;
 			hasmousereleased = false;
 		}
 	}
@@ -687,7 +679,7 @@ void script::mousemoved(int x, int y, int dx, int dy) {
 			chaimousemoved(x, y, dx, dy);
 		}
 		catch (const std::exception& e) {
-			LibretroLog::log(RETRO_LOG_ERROR) << "[ChaiLove] [script] Failed to call mousemoved(): " << e.what() << std::endl;
+			//LibretroLog::log(RETRO_LOG_ERROR) << "[ChaiLove] [script] Failed to call mousemoved(): " << e.what() << std::endl;
 			hasmousemoved = false;
 		}
 	}
@@ -701,7 +693,7 @@ void script::keypressed(const std::string& key, int scancode) {
 			chaikeypressed(key, scancode);
 		}
 		catch (const std::exception& e) {
-			LibretroLog::log(RETRO_LOG_ERROR) << "[ChaiLove] [script] Failed to call keypressed(): " << e.what() << std::endl;
+			//LibretroLog::log(RETRO_LOG_ERROR) << "[ChaiLove] [script] Failed to call keypressed(): " << e.what() << std::endl;
 			haskeypressed = false;
 		}
 	}
@@ -715,7 +707,7 @@ void script::keyreleased(const std::string& key, int scancode) {
 			chaikeyreleased(key, scancode);
 		}
 		catch (const std::exception& e) {
-			LibretroLog::log(RETRO_LOG_ERROR) << "[ChaiLove] [script] Failed to call keyreleased(): " << e.what() << std::endl;
+			//LibretroLog::log(RETRO_LOG_ERROR) << "[ChaiLove] [script] Failed to call keyreleased(): " << e.what() << std::endl;
 			haskeyreleased = false;
 		}
 	}
@@ -732,7 +724,7 @@ std::string script::savestate() {
 			return chaisavestate();
 		}
 		catch (const std::exception& e) {
-			LibretroLog::log(RETRO_LOG_ERROR) << "[ChaiLove] [script] Failed to call savestate(): " << e.what() << std::endl;
+			//LibretroLog::log(RETRO_LOG_ERROR) << "[ChaiLove] [script] Failed to call savestate(): " << e.what() << std::endl;
 			hassavestate = false;
 		}
 	}
@@ -752,7 +744,7 @@ bool script::loadstate(const std::string& data) {
 			return chailoadstate(data);
 		}
 		catch (const std::exception& e) {
-			LibretroLog::log(RETRO_LOG_ERROR) << "[ChaiLove] [script] Failed to call loadstate(): " << e.what() << std::endl;
+			//LibretroLog::log(RETRO_LOG_ERROR) << "[ChaiLove] [script] Failed to call loadstate(): " << e.what() << std::endl;
 			hasloadstate = false;
 		}
 	}
@@ -769,7 +761,7 @@ void script::cheatreset() {
 			chaicheatreset();
 		}
 		catch (const std::exception& e) {
-			LibretroLog::log(RETRO_LOG_ERROR) << "[ChaiLove] [script] Failed to call cheatreset(): " << e.what() << std::endl;
+			//LibretroLog::log(RETRO_LOG_ERROR) << "[ChaiLove] [script] Failed to call cheatreset(): " << e.what() << std::endl;
 			hascheatreset = false;
 		}
 	}
@@ -783,7 +775,7 @@ void script::cheatset(int index, bool enabled, const std::string& code) {
 			chaicheatset(index, enabled, code);
 		}
 		catch (const std::exception& e) {
-			LibretroLog::log(RETRO_LOG_ERROR) << "[ChaiLove] [script] Failed to call cheatset(): " << e.what() << std::endl;
+			//LibretroLog::log(RETRO_LOG_ERROR) << "[ChaiLove] [script] Failed to call cheatset(): " << e.what() << std::endl;
 			hascheatset = false;
 		}
 	}
@@ -797,7 +789,7 @@ void script::exit() {
 			chaiexit();
 		}
 		catch (const std::exception& e) {
-			LibretroLog::log(RETRO_LOG_ERROR) << "[ChaiLove] [script] Failed to call exit(): " << e.what() << std::endl;
+			//LibretroLog::log(RETRO_LOG_ERROR) << "[ChaiLove] [script] Failed to call exit(): " << e.what() << std::endl;
 			hasexit = false;
 		}
 	}

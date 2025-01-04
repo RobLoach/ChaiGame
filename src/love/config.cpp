@@ -7,7 +7,6 @@ config::config() {
 	options["alphablending"] = true;
 	options["highquality"] = true;
 	version = CHAILOVE_VERSION_STRING;
-	console = false;
 }
 
 }  // namespace love

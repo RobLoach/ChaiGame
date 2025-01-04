@@ -12,7 +12,7 @@ namespace love {
  */
 class sound {
 	public:
-	bool load();
+	bool load(pntr_app* application);
 	bool isLoaded();
 	bool hasAudio();
 	void unload();
@@ -49,6 +49,8 @@ class sound {
 	bool m_loaded = false;
 	retro_audio_sample_t audio_cb = NULL;
 	retro_audio_sample_batch_t audio_batch_cb = NULL;
+
+	pntr_app* app = NULL;
 };
 
 }  // namespace love

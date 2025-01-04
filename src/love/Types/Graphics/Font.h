@@ -1,10 +1,9 @@
 #ifndef SRC_LOVE_TYPES_GRAPHICS_FONT_H_
 #define SRC_LOVE_TYPES_GRAPHICS_FONT_H_
 
-#include "SDL.h"
-#include "SDL_ttf.h"
+#include "pntr_app.h"
+#include "pntr.h"
 #include <string>
-#include <SDL_fnt.h>
 #include "Image.h"
 
 namespace love {
@@ -27,9 +26,8 @@ class Font {
 	bool loaded();
 	bool destroy();
 	void print(const std::string& text, int x, int y, int r, int g, int b, int a);
-	TTF_Font* ttfFont = NULL;
-	TTY_Font* ttyFont = NULL;
-	int ttyFontWidth, ttyFontHeight;
+	void print(const std::string& text, int x, int y, pntr_color color);
+	pntr_font* font = NULL;
 
 	/**
 	 * Determines the vertical size the given text needs.
@@ -45,8 +43,6 @@ class Font {
 	 * Determines the horizontal size a line of text needs.
 	 */
 	int getWidth(const std::string& text);
-
-	Image* m_image = NULL;
 };
 
 }  // namespace Graphics

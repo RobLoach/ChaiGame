@@ -1,6 +1,5 @@
 #include "system.h"
 #include "../ChaiLove.h"
-#include "../LibretroLog.h"
 
 #include <string>
 #include <cstdlib>
@@ -107,26 +106,28 @@ std::string system::getUsername() {
 
 bool system::execute(const std::string& command) {
 #ifdef CHAILOVE_DISABLE_LOVE_SYSTEM_EXECUTE
-	LibretroLog::log(RETRO_LOG_ERROR) << "[ChaiLove] [system] love.system.execute() is disabled." << std::endl;
+	//LibretroLog::log(RETRO_LOG_ERROR) << "[ChaiLove] [system] love.system.execute() is disabled." << std::endl;
 	return false;
 #else
-	LibretroLog::log(RETRO_LOG_INFO) << "[ChaiLove] [system] love.system.execute(\"" << command << "\")" << std::endl;
+	//LibretroLog::log(RETRO_LOG_INFO) << "[ChaiLove] [system] love.system.execute(\"" << command << "\")" << std::endl;
 	int result = std::system(command.c_str());
 	if (result != 0) {
-		LibretroLog::log(RETRO_LOG_ERROR) << "[ChaiLove] [system] Failed to execute " << command << std::endl;
+		//LibretroLog::log(RETRO_LOG_ERROR) << "[ChaiLove] [system] Failed to execute " << command << std::endl;
 		return false;
 	}
-	LibretroLog::log(RETRO_LOG_INFO) << "[ChaiLove] [system] Finished " << command << std::endl;
+	//LibretroLog::log(RETRO_LOG_INFO) << "[ChaiLove] [system] Finished " << command << std::endl;
 	return true;
 #endif
 }
 
 std::string system::getClipboardText() {
-	return m_clipboardtext;
+	pntr_app* app = ChaiLove::getInstance()->app;
+
+	return pntr_app_clipboard(app);
 }
 
 system& system::setClipboardText(const std::string& text) {
-	m_clipboardtext = text;
+	pntr_app_set_clipboard(ChaiLove::getInstance()->app, text.c_str(), text.length());
 	return *this;
 }
 

@@ -127,7 +127,6 @@ class system {
 
 	bool load(config& t);
 
-	std::string m_clipboardtext;
 	std::string m_username;
 	bool m_usernameInitialized = false;
 };

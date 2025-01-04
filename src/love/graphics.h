@@ -3,8 +3,7 @@
 
 #include <vector>
 
-#include "SDL.h"
-#include "SDL_gfxPrimitives.h"
+#include "pntr_app.h"
 #include "Types/Graphics/Image.h"
 #include "Types/Graphics/Quad.h"
 #include "Types/Graphics/Font.h"
@@ -301,9 +300,10 @@ class graphics {
 	 */
 	graphics& arc(const std::string& drawmode, int x, int y, int radius, int angle1, int angle2);
 
-	Uint8 r = 255, g = 255, b = 255, a = 255;
-	Uint8 backR = 0, backG = 0, backB = 0, backA = 255;
-	SDL_Surface* getScreen();
+	pntr_color color_front;
+	pntr_color color_back;
+
+	pntr_image* getScreen();
 	Font* activeFont = NULL;
 	Font defaultFont;
 
