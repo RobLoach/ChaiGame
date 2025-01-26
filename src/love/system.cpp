@@ -1,6 +1,5 @@
 #include "system.h"
 #include "../ChaiLove.h"
-#include "../LibretroLog.h"
 
 #include <string>
 #include <cstdlib>
@@ -16,7 +15,9 @@ system::system() {
 
 std::string system::getOS() {
 	// TODO(RobLoach): Replace Macros with something more complex?
-	#if (defined __HAIKU__)
+	#if (defined __EMSCRIPTEN__)
+	return "Web";
+	#elif (defined __HAIKU__)
 	return "Linux";
 	#elif((defined __BEOS__) ||(defined __beos__))
 	return "Linux";
@@ -107,26 +108,28 @@ std::string system::getUsername() {
 
 bool system::execute(const std::string& command) {
 #ifdef CHAILOVE_DISABLE_LOVE_SYSTEM_EXECUTE
-	LibretroLog::log(RETRO_LOG_ERROR) << "[ChaiLove] [system] love.system.execute() is disabled." << std::endl;
+	pntr_app_log(PNTR_APP_LOG_ERROR, "[ChaiLove] [system] love.system.execute() is disabled");
 	return false;
 #else
-	LibretroLog::log(RETRO_LOG_INFO) << "[ChaiLove] [system] love.system.execute(\"" << command << "\")" << std::endl;
+	pntr_app_log_ex(PNTR_APP_LOG_INFO, "[ChaiLove] [system] love.system.execute: %s", command.c_str());
 	int result = std::system(command.c_str());
 	if (result != 0) {
-		LibretroLog::log(RETRO_LOG_ERROR) << "[ChaiLove] [system] Failed to execute " << command << std::endl;
+		pntr_app_log(PNTR_APP_LOG_ERROR, "[ChaiLove] [system] love.system.execute failed");
 		return false;
 	}
-	LibretroLog::log(RETRO_LOG_INFO) << "[ChaiLove] [system] Finished " << command << std::endl;
+	pntr_app_log(PNTR_APP_LOG_INFO, "[ChaiLove] [system] love.system.execute finished");
 	return true;
 #endif
 }
 
 std::string system::getClipboardText() {
-	return m_clipboardtext;
+	pntr_app* app = ChaiLove::getInstance()->app;
+
+	return pntr_app_clipboard(app);
 }
 
 system& system::setClipboardText(const std::string& text) {
-	m_clipboardtext = text;
+	pntr_app_set_clipboard(ChaiLove::getInstance()->app, text.c_str(), text.length());
 	return *this;
 }
 

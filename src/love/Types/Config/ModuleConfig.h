@@ -7,6 +7,8 @@ namespace Config {
 
 /**
  * Allows enabling or disiabling modules during initialization.
+ *
+ * @see https://love2d.org/wiki/Config_Files
  */
 struct ModuleConfig {
 	/**

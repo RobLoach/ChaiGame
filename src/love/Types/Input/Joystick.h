@@ -3,6 +3,8 @@
 
 #include <string>
 
+#include "pntr_app.h"
+
 namespace love {
 namespace Types {
 namespace Input {
@@ -13,7 +15,7 @@ namespace Input {
 class Joystick {
 	public:
 	Joystick();
-	Joystick(int index);
+	Joystick(pntr_app* app, int index);
 
 	/**
 	 * Gets the name of the joystick.
@@ -22,7 +24,7 @@ class Joystick {
 	 */
 	std::string getName();
 
-	void clearStates();
+	pntr_app* m_app;
 
 	/**
 	 * Checks if a button on the Joystick is pressed.
@@ -60,8 +62,6 @@ class Joystick {
 
 	private:
 	int m_index = 0;
-	std::string name = "RetroPad";
-	int16_t m_state[14];
 	bool m_connected = true;
 };
 

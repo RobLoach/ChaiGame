@@ -6,25 +6,41 @@
 #include "Types/Graphics/Point.h"
 #include "../ChaiLove.h"
 
+#include "pntr_app.h"
+
 using love::Types::Graphics::Point;
 using ::ChaiLove;
 
 namespace love {
 
-bool mouse::load() {
+bool mouse::load(pntr_app* app) {
+	m_app = app;
 	return true;
 }
 
-int mouse::getX() {
-	return m_x;
+float mouse::getX() {
+	return pntr_app_mouse_x(m_app);
 }
 
-int mouse::getY() {
-	return m_y;
+float mouse::getY() {
+	return pntr_app_mouse_y(m_app);
 }
 
 bool mouse::isDown(int button) {
-	return m_buttonState[button] != 0;
+	if (button == RETRO_DEVICE_ID_MOUSE_WHEELUP) {
+		return pntr_app_mouse_wheel(m_app) < 0;
+	}
+	else if (button == RETRO_DEVICE_ID_MOUSE_WHEELDOWN) {
+		return pntr_app_mouse_wheel(m_app) > 0;
+	}
+	else if (button < PNTR_APP_MOUSE_BUTTON_FIRST) {
+		return false;
+	}
+	else if (button >= PNTR_APP_MOUSE_BUTTON_LAST) {
+		return false;
+	}
+
+	return pntr_app_key_down(m_app, (pntr_app_key)button);
 }
 bool mouse::isDown(const std::string& button) {
 	return isDown(getButtonKey(button));
@@ -32,76 +48,34 @@ bool mouse::isDown(const std::string& button) {
 
 int mouse::getButtonKey(const std::string& button) {
 	if (button == "left" || button == "l") {
-		return RETRO_DEVICE_ID_MOUSE_LEFT;
+		return PNTR_APP_MOUSE_BUTTON_LEFT;
 	} else if (button == "right" || button == "r") {
-		return RETRO_DEVICE_ID_MOUSE_RIGHT;
+		return PNTR_APP_MOUSE_BUTTON_RIGHT;
 	} else if (button == "middle" || button == "m") {
-		return RETRO_DEVICE_ID_MOUSE_MIDDLE;
+		return PNTR_APP_MOUSE_BUTTON_MIDDLE;
 	} else if (button == "wheelup" || button == "wu") {
 		return RETRO_DEVICE_ID_MOUSE_WHEELUP;
 	} else if (button == "wheeldown" || button == "wd") {
 		return RETRO_DEVICE_ID_MOUSE_WHEELDOWN;
-	} else if (button == "hwu") {
-		return RETRO_DEVICE_ID_MOUSE_HORIZ_WHEELUP;
-	} else if (button == "hwd") {
-		return RETRO_DEVICE_ID_MOUSE_HORIZ_WHEELDOWN;
-	} else if (button == "x1") {
-		return RETRO_DEVICE_ID_MOUSE_BUTTON_4;
-	} else if (button == "x2") {
-		return RETRO_DEVICE_ID_MOUSE_BUTTON_5;
 	}
+
 	return -1;
 }
 
 std::string mouse::getButtonName(int button) {
 	switch (button) {
-		case RETRO_DEVICE_ID_MOUSE_LEFT:
+		case PNTR_APP_MOUSE_BUTTON_LEFT:
 			return "l";
-		case RETRO_DEVICE_ID_MOUSE_RIGHT:
+		case PNTR_APP_MOUSE_BUTTON_RIGHT:
 			return "r";
-		case RETRO_DEVICE_ID_MOUSE_MIDDLE:
+		case PNTR_APP_MOUSE_BUTTON_MIDDLE:
 			return "m";
 		case RETRO_DEVICE_ID_MOUSE_WHEELUP:
 			return "wd";
 		case RETRO_DEVICE_ID_MOUSE_WHEELDOWN:
 			return "wu";
-		case RETRO_DEVICE_ID_MOUSE_HORIZ_WHEELUP:
-			return "hwu";
-		case RETRO_DEVICE_ID_MOUSE_HORIZ_WHEELDOWN:
-			return "hwd";
-		case RETRO_DEVICE_ID_MOUSE_BUTTON_4:
-			return "x1";
-		case RETRO_DEVICE_ID_MOUSE_BUTTON_5:
-			return "x2";
 	}
 	return "unknown";
-}
-
-void mouse::update() {
-	int16_t state, dx, dy;
-
-	// Update the x/y coordinates.
-	dx = ChaiLove::input_state_cb(0, RETRO_DEVICE_MOUSE, 0, RETRO_DEVICE_ID_MOUSE_X);
-	dy = ChaiLove::input_state_cb(0, RETRO_DEVICE_MOUSE, 0, RETRO_DEVICE_ID_MOUSE_Y);
-	if (dx != 0 || dy != 0) {
-		m_x = m_x + dx;
-		m_y = m_y + dy;
-		mousemoved(m_x, m_y, dx, dy);
-	}
-
-	// Update all buttons.
-	for (int i = RETRO_DEVICE_ID_MOUSE_LEFT; i <= RETRO_DEVICE_ID_MOUSE_BUTTON_5; i++) {
-		state = ChaiLove::input_state_cb(0, RETRO_DEVICE_MOUSE, 0, i);
-
-		if (state != m_buttonState[i]) {
-			m_buttonState[i] = state;
-			if (m_buttonState[i] == 0) {
-				mousereleased(m_x, m_y, getButtonName(i));
-			} else {
-				mousepressed(m_x, m_y, getButtonName(i));
-			}
-		}
-	}
 }
 
 void mouse::mousemoved(int x, int y, int dx, int dy) {
@@ -116,8 +90,12 @@ void mouse::mousereleased(int x, int y, const std::string& button) {
 	ChaiLove::getInstance()->script->mousereleased(x, y, button);
 }
 
+void mouse::wheelmoved(int x, int y) {
+	ChaiLove::getInstance()->script->wheelmoved(x, y);
+}
+
 Point mouse::getPosition() {
-	return Point(m_x, m_y);
+	return Point(pntr_app_mouse_x(m_app), pntr_app_mouse_y(m_app));
 }
 
 }  // namespace love

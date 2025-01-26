@@ -3,7 +3,7 @@
 #include "Types/Audio/SoundData.h"
 #include "../ChaiLove.h"
 #include "sound.h"
-//#include "audio/conversion/float_to_s16.h"
+#include "audio/conversion/float_to_s16.h"
 
 using love::Types::Audio::SoundData;
 
@@ -22,6 +22,7 @@ SoundData* audio::newSource(const std::string& filename) {
 		ChaiLove::getInstance()->sound.sounds.push_back(newSound);
 		return newSound;
 	}
+	delete newSound;
 	return NULL;
 }
 

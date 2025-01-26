@@ -3,6 +3,7 @@
 
 #include <string>
 #include "config.h"
+#include "pntr_app.h"
 #include "Types/Graphics/Point.h"
 
 using love::Types::Graphics::Point;
@@ -45,8 +46,10 @@ class window {
 	window& showMessageBox(const std::string& msg, int frames);
 	window& showMessageBox(const std::string& msg);
 
-	bool load(const config& conf);
+	bool load(pntr_app* app, const config& conf);
 	bool unload();
+
+	pntr_app* m_app;
 };
 
 }  // namespace love

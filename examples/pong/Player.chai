@@ -17,9 +17,12 @@ class Player {
   }
 
   def draw() {
-    love.graphics.setColor(170, 130, 57);
+    // Paddle
+    love.graphics.setColor(255, 121, 198);
     love.graphics.rectangle("fill", this.x, this.y, this.width, this.height);
-    love.graphics.setColor(102, 153, 153);
+
+    // Score
+    love.graphics.setColor(248, 248, 242);
     love.graphics.print(to_string(this.score), this.x, 50);
   }
 

@@ -11,8 +11,15 @@ SOURCES_CXX := $(wildcard \
 SOURCES_S =
 FLAGS += -Wfatal-errors
 
-# random
-FLAGS += -I$(CORE_DIR)/vendor/random/include
+# pntr
+FLAGS += -I$(CORE_DIR)/vendor/pntr
+FLAGS += -I$(CORE_DIR)/vendor/pntr_app/include
+FLAGS += \
+	-DPNTR_CUTE_PNG \
+	-DPNTR_ENABLE_VARGS
+
+# pntr_physfs
+FLAGS += -I$(CORE_DIR)/vendor/pntr_physfs
 
 # libretro-common
 FLAGS += -I$(CORE_DIR)/vendor/libretro-common/include \
@@ -47,13 +54,12 @@ ifneq ($(STATIC_LINKING), 1)
 	SOURCES_C += $(CORE_DIR)/vendor/libretro-common/string/stdstring.c
 	SOURCES_C += $(CORE_DIR)/vendor/libretro-common/time/rtime.c
 	SOURCES_C += $(CORE_DIR)/vendor/libretro-common/vfs/vfs_implementation.c
-    SOURCES_C += $(CORE_DIR)/vendor/libretro-common/compat/fopen_utf8.c
+    #SOURCES_C += $(CORE_DIR)/vendor/libretro-common/compat/fopen_utf8.c
 
     # Ensure the sinc_resampler_neon is available for ARM NEON devices.
 	SOURCES_S += $(CORE_DIR)/vendor/libretro-common/audio/resampler/drivers/sinc_resampler_neon.S
 
     # MD5
-    FLAGS += -I$(CORE_DIR)/vendor/libretro-common/include
     SOURCES_C += $(CORE_DIR)/vendor/libretro-common/utils/md5.c
 endif
 
@@ -94,14 +100,13 @@ FLAGS += -DWANT_ZLIB
 # PhysFS
 PHYSFS_DIR = $(CORE_DIR)/vendor/physfs-libretro
 FLAGS += -I$(PHYSFS_DIR)/src
-FLAGS += -I$(PHYSFS_DIR)/extras
+
 FLAGS += -DPHYSFS_NO_CDROM_SUPPORT=1 \
 	-DPHYSFS_SUPPORTS_DEFAULT=0 \
 	-DPHYSFS_SUPPORTS_ZIP=1 \
 	-DPHYSFS_PLATFORM_LIBRETRO
 
 SOURCES_C += $(wildcard \
-	$(PHYSFS_DIR)/extras/physfsrwops.c \
 	$(PHYSFS_DIR)/src/*.c \
 )
 ifeq ($(platform), osx)
@@ -111,88 +116,6 @@ ifeq ($(platform), osx)
 #	FLAGS += -D__MACH__ -D__APPLE__ -DPHYSFS_PLATFORM_APPLE
 	FLAGS += -D__MACH__ -D__APPLE__
 endif
-
-# SDL_tty
-FLAGS += -I$(CORE_DIR)/vendor/SDL_tty/include/SDL_tty
-SOURCES_C += $(wildcard \
-	$(CORE_DIR)/vendor/SDL_tty/src/SDL_fnt.c \
-	$(CORE_DIR)/vendor/SDL_tty/src/SDL_tty.c \
-)
-
-# SDL_gfx
-FLAGS += -I$(CORE_DIR)/vendor/sdl-libretro/tests/SDL_gfx-2.0.26
-SOURCES_C += $(wildcard \
-	$(CORE_DIR)/vendor/sdl-libretro/tests/SDL_gfx-2.0.26/*.c \
-)
-
-# FreeType2
-# See https://github.com/emscripten-ports/FreeType/blob/master/builds/amiga/makefile
-FLAGS += -I$(CORE_DIR)/vendor/libretro-deps/freetype/include
-FLAGS += -DFT2_BUILD_LIBRARY \
-	-DFT_USE_AUTOFIT \
-	-DFT_USE_RASTER \
-	-DFT_USE_SMOOTH \
-	-DFT_USE_TT \
-	-DFT_USE_T1 \
-	-DFT_USE_T42 \
-	-DFT_USE_T1CID \
-	-DFT_USE_CFF \
-	-DFT_USE_OTV \
-	-DFT_USE_GXV
-
-SOURCES_C += \
-	$(CORE_DIR)/vendor/libretro-deps/freetype/src/autofit/autofit.c \
-	$(CORE_DIR)/vendor/libretro-deps/freetype/src/base/ftbase.c \
-	$(CORE_DIR)/vendor/libretro-deps/freetype/src/base/ftbbox.c \
-	$(CORE_DIR)/vendor/libretro-deps/freetype/src/base/ftbdf.c \
-	$(CORE_DIR)/vendor/libretro-deps/freetype/src/base/ftbitmap.c \
-	$(CORE_DIR)/vendor/libretro-deps/freetype/src/base/ftcid.c \
-	$(CORE_DIR)/vendor/libretro-deps/freetype/src/base/ftdebug.c \
-	$(CORE_DIR)/vendor/libretro-deps/freetype/src/base/ftfntfmt.c \
-	$(CORE_DIR)/vendor/libretro-deps/freetype/src/base/ftfstype.c \
-	$(CORE_DIR)/vendor/libretro-deps/freetype/src/base/ftgasp.c \
-	$(CORE_DIR)/vendor/libretro-deps/freetype/src/base/ftglyph.c \
-	$(CORE_DIR)/vendor/libretro-deps/freetype/src/base/ftgxval.c \
-	$(CORE_DIR)/vendor/libretro-deps/freetype/src/base/ftinit.c \
-	$(CORE_DIR)/vendor/libretro-deps/freetype/src/base/ftlcdfil.c \
-	$(CORE_DIR)/vendor/libretro-deps/freetype/src/base/ftmm.c \
-	$(CORE_DIR)/vendor/libretro-deps/freetype/src/base/ftotval.c \
-	$(CORE_DIR)/vendor/libretro-deps/freetype/src/base/ftpatent.c \
-	$(CORE_DIR)/vendor/libretro-deps/freetype/src/base/ftpfr.c \
-	$(CORE_DIR)/vendor/libretro-deps/freetype/src/base/ftstroke.c \
-	$(CORE_DIR)/vendor/libretro-deps/freetype/src/base/ftsynth.c \
-	$(CORE_DIR)/vendor/libretro-deps/freetype/src/base/ftsystem.c \
-	$(CORE_DIR)/vendor/libretro-deps/freetype/src/base/fttype1.c \
-	$(CORE_DIR)/vendor/libretro-deps/freetype/src/base/ftwinfnt.c \
-	$(CORE_DIR)/vendor/libretro-deps/freetype/src/bdf/bdf.c \
-	$(CORE_DIR)/vendor/libretro-deps/freetype/src/bzip2/ftbzip2.c \
-	$(CORE_DIR)/vendor/libretro-deps/freetype/src/cache/ftcache.c \
-	$(CORE_DIR)/vendor/libretro-deps/freetype/src/cff/cff.c \
-	$(CORE_DIR)/vendor/libretro-deps/freetype/src/cid/type1cid.c \
-	$(CORE_DIR)/vendor/libretro-deps/freetype/src/gzip/ftgzip.c \
-	$(CORE_DIR)/vendor/libretro-deps/freetype/src/lzw/ftlzw.c \
-	$(CORE_DIR)/vendor/libretro-deps/freetype/src/pcf/pcf.c \
-	$(CORE_DIR)/vendor/libretro-deps/freetype/src/pfr/pfr.c \
-	$(CORE_DIR)/vendor/libretro-deps/freetype/src/psaux/psaux.c \
-	$(CORE_DIR)/vendor/libretro-deps/freetype/src/pshinter/pshinter.c \
-	$(CORE_DIR)/vendor/libretro-deps/freetype/src/psnames/psnames.c \
-	$(CORE_DIR)/vendor/libretro-deps/freetype/src/raster/raster.c \
-	$(CORE_DIR)/vendor/libretro-deps/freetype/src/sfnt/sfnt.c \
-	$(CORE_DIR)/vendor/libretro-deps/freetype/src/smooth/smooth.c \
-	$(CORE_DIR)/vendor/libretro-deps/freetype/src/truetype/truetype.c \
-	$(CORE_DIR)/vendor/libretro-deps/freetype/src/type1/type1.c \
-	$(CORE_DIR)/vendor/libretro-deps/freetype/src/type42/type42.c \
-	$(CORE_DIR)/vendor/libretro-deps/freetype/src/winfonts/winfnt.c
-
-# SDL_ttf
-FLAGS += -I$(CORE_DIR)/vendor/sdl-libretro/tests/SDL_ttf-2.0.11/VisualC/external/include
-SOURCES_C += $(CORE_DIR)/vendor/sdl-libretro/tests/SDL_ttf-2.0.11/SDL_ttf.c
-
-# SDL_stbimage
-FLAGS += -I$(CORE_DIR)/vendor/Snippets
-
-# STB
-FLAGS += -I$(CORE_DIR)/vendor/stb
 
 # TinySHA1
 FLAGS += -I$(CORE_DIR)/vendor/TinySHA1
@@ -208,15 +131,6 @@ ifeq ($(HAVE_CHAISCRIPT),)
 	FLAGS += -DCHAISCRIPT_NO_THREADS -DCHAISCRIPT_NO_THREADS_WARNING -DCHAISCRIPT_NO_DYNLOAD
 	FLAGS += -DCHAISCRIPT_EXTRAS_MATH_SKIP_ADVANCED
 endif
-
-# SDL
-ifeq ($(platform), win)
-	SOURCES_C += $(wildcard ./vendor/sdl-libretro/src/*.c  ./vendor/sdl-libretro/src/audio/*.c  ./vendor/sdl-libretro/src/cdrom/dummy/*.c  ./vendor/sdl-libretro/src/cdrom/*.c  ./vendor/sdl-libretro/src/cpuinfo/*.c  ./vendor/sdl-libretro/src/events/*.c  ./vendor/sdl-libretro/src/file/*.c  ./vendor/sdl-libretro/src/stdlib/*.c  ./vendor/sdl-libretro/src/thread/*.c  ./vendor/sdl-libretro/src/timer/*.c  ./vendor/sdl-libretro/src/video/*.c  ./vendor/sdl-libretro/src/joystick/*.c  ./vendor/sdl-libretro/src/video/libretro/*.c  ./vendor/sdl-libretro/src/joystick/libretro/*.c  ./vendor/sdl-libretro/src/timer/libretro/*.c  ./vendor/sdl-libretro/src/audio/libretro/*.c  ./vendor/sdl-libretro/src/thread/win32/SDL_sysmutex.c ./vendor/sdl-libretro/src/thread/win32/SDL_syssem.c ./vendor/sdl-libretro/src/thread/win32/SDL_systhread.c ./vendor/sdl-libretro/src/thread/generic/SDL_syscond.c ./vendor/sdl-libretro/src/loadso/dummy/*.c)
-else
-	SOURCES_C += $(wildcard $(CORE_DIR)/vendor/sdl-libretro/src/*.c $(CORE_DIR)/vendor/sdl-libretro/src/audio/*.c  $(CORE_DIR)/vendor/sdl-libretro/src/cdrom/dummy/*.c  $(CORE_DIR)/vendor/sdl-libretro/src/cdrom/*.c  $(CORE_DIR)/vendor/sdl-libretro/src/cpuinfo/*.c  $(CORE_DIR)/vendor/sdl-libretro/src/events/*.c  $(CORE_DIR)/vendor/sdl-libretro/src/file/*.c  $(CORE_DIR)/vendor/sdl-libretro/src/stdlib/*.c  $(CORE_DIR)/vendor/sdl-libretro/src/thread/*.c  $(CORE_DIR)/vendor/sdl-libretro/src/timer/*.c  $(CORE_DIR)/vendor/sdl-libretro/src/video/*.c  $(CORE_DIR)/vendor/sdl-libretro/src/joystick/*.c  $(CORE_DIR)/vendor/sdl-libretro/src/video/libretro/*.c  $(CORE_DIR)/vendor/sdl-libretro/src/thread/generic/*.c $(CORE_DIR)/vendor/sdl-libretro/src/joystick/libretro/*.c  $(CORE_DIR)/vendor/sdl-libretro/src/timer/libretro/*.c  $(CORE_DIR)/vendor/sdl-libretro/src/audio/libretro/*.c  $(CORE_DIR)/vendor/sdl-libretro/src/loadso/dummy/*.c)
-endif
-FLAGS += -DSDL_THREADS_DISABLED -DSDL_CDROM_DISABLED
-FLAGS += -I$(CORE_DIR)/vendor/sdl-libretro/include
 
 OBJECTS += $(SOURCES_CXX:.cpp=.o) $(SOURCES_C:.c=.o) $(SOURCES_S:.S=.o) $(SOURCES_M:.m=.o)
 

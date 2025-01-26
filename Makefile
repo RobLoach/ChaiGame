@@ -46,15 +46,11 @@ clean:
 test: unittest unittest-chailove
 	@echo "Run the testing suite by using:\n\n    retroarch -L $(TARGET) test/main.chai\n\n"
 
-vendor/noarch/noarch:
-	cd vendor/noarch && cmake .
-	@$(MAKE) -C vendor/noarch
+unittest: all
+	@retroarch -L $(CORE_DIR)/$(TARGET) test/unittests/main.chai
 
-unittest: vendor/noarch/noarch all
-	vendor/noarch/noarch $(CORE_DIR)/$(TARGET) test/unittests/main.chai
-
-unittest-chailove: vendor/noarch/noarch all
-	vendor/noarch/noarch $(CORE_DIR)/$(TARGET) test/test.chailove
+unittest-chailove: all
+	@retroarch -L $(CORE_DIR)/$(TARGET) test/test.chailove
 
 examples: all
 	@retroarch -L $(TARGET) examples/benchmark/main.chai

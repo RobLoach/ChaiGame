@@ -1,9 +1,0 @@
-// isEnabled()
-assert_equal(love.console.isEnabled(), true, "love.console.getEnabled()")
-
-// isShown()
-assert_equal(love.console.isShown(), false, "love.console.isShown()")
-
-// setEnabled()
-love.console.setEnabled(false)
-assert_equal(love.console.isEnabled(), false, "love.console.setEnabled()")

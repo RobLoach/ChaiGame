@@ -24,7 +24,6 @@ namespace love {
  *   t.window.title = "My Game" // Human-readable name
  *   t.window.width = 1024      // Game width
  *   t.window.height = 768      // Game height
- *   t.console = false          // Developer console, toggle with tilde
  * }
  * @endcode
  */
@@ -87,19 +86,6 @@ class config {
 	 */
 	std::map<std::string, bool> options;
 
-	/**
-	 * Attach the in-game console.
-	 *
-	 * When `t.console = true`, will allow use of the in-game console. Use the tilde key to display.
-	 *
-	 * ## Example
-	 *
-	 * @code
-	 * t.console = true
-	 * @endcode
-	 *
-	 * @see love.console
-	 */
 	bool console = false;
 };
 

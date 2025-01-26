@@ -1,7 +1,7 @@
 #ifndef SRC_LOVE_TYPES_GRAPHICS_COLOR_H_
 #define SRC_LOVE_TYPES_GRAPHICS_COLOR_H_
 
-#include "SDL.h"
+#include "pntr_app.h"
 
 namespace love {
 namespace Types {
@@ -32,6 +32,15 @@ struct Color {
 		// Nothing.
 	}
 
+	Color(pntr_color color) {
+		r = pntr_color_r(color);
+		g = pntr_color_g(color);
+		b = pntr_color_b(color);
+		a = pntr_color_a(color);
+	}
+
+	pntr_color to_pntr_color();
+
 	/**
 	 * The amount of red.
 	 */
@@ -51,15 +60,6 @@ struct Color {
 	 * The amount of alpha.
 	 */
 	int a;
-
-	SDL_Color toSDLColor() {
-		SDL_Color c;
-		c.r = r;
-		c.g = g;
-		c.b = b;
-		c.unused = a;
-		return c;
-	}
 };
 
 }  // namespace Graphics

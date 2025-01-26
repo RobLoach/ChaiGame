@@ -2,6 +2,7 @@
 #define SRC_LOVE_MATH_H_
 
 #include <string>
+#include "pntr_app.h"
 
 namespace love {
 /**
@@ -9,7 +10,7 @@ namespace love {
  */
 class math {
 	public:
-	bool load();
+	bool load(pntr_app* app);
 
 	/**
 	 * Get uniformly distributed pseudo-random number, between the given numbers.
@@ -93,6 +94,8 @@ class math {
 
 	private:
 	int m_seed = 0;
+
+	pntr_app* app;
 };
 
 }  // namespace love

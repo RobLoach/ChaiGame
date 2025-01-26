@@ -1,7 +1,7 @@
 #ifndef SRC_LOVE_TYPES_GRAPHICS_IMAGE_H_
 #define SRC_LOVE_TYPES_GRAPHICS_IMAGE_H_
 
-#include <SDL.h>
+#include "pntr.h"
 #include <string>
 
 namespace love {
@@ -15,12 +15,12 @@ namespace Graphics {
  */
 class Image {
 	public:
-	SDL_Surface* surface;
-	Image(SDL_RWops* rw);
+	pntr_image* surface;
+	Image(const unsigned char* data, unsigned int size);
 	Image(const std::string& filename);
 	~Image();
 	bool loaded();
-	bool loadFromRW(SDL_RWops* rw);
+	bool loadFromRW(const unsigned char* data, unsigned int size);
 	bool destroy();
 
 	/**

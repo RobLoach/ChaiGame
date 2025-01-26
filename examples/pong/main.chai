@@ -9,7 +9,7 @@ global ball
  * ChaiLove callback; Load the application.
  */
 def load() {
-  love.graphics.setBackgroundColor(0, 51, 51);
+  love.graphics.setBackgroundColor(40, 42, 54);
   pongSound = love.sound.newSoundData("pong.wav")
 
   ballReset()
@@ -28,7 +28,7 @@ def draw() {
   for (var i = 0; i < 2; ++i) {
     players[i].draw()
   }
-  love.graphics.setColor(170, 68, 57);
+  love.graphics.setColor(80, 250, 123);
   love.graphics.circle("fill", ball["x"], ball["y"], ball["radius"]);
 }
 

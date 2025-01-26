@@ -4,6 +4,10 @@ All notable changes to [ChaiLove](https://github.com/RobLoach/ChaiLove) will be 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## 2.0.0 - WIP
+### Changed
+- Moved from [sdl-libretro](https://github.com/libretro/sdl-libretro) to [pntr](https://github.com/robloach/pntr) and [pntr_app](https://github.com/robloach/pntr)
+
 ## 1.3.0 - 2024-05-11
 ### Fixes
 - Fix playing empty ogg files through `libretro-common`, by @phcoder

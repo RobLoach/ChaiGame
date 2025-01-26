@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-#include "SDL.h"
+#include "pntr_app.h"
 #include "physfs.h"
 #include "Types/FileSystem/FileInfo.h"
 #include "Types/FileSystem/FileData.h"
@@ -35,10 +35,10 @@ class filesystem {
 	bool load(const std::string& file);
 	void mountlibretro();
 
-	bool init(const std::string& file, const void* data);
+	bool init(const std::string& file, const void* data, unsigned int dataSize);
 	bool unload();
-	SDL_RWops* openRW(const std::string& filename);
-	char* readChar(const std::string& filename);
+	void* openRW(const std::string& filename);
+	unsigned char* readBuffer(const std::string& filename);
 
 	/**
 	 * Read the contents of a file.
@@ -53,7 +53,6 @@ class filesystem {
 	 * @endcode
 	 */
 	std::string read(const std::string& filename);
-	void* readBuffer(const std::string& filename, int& size);
 
 	/**
 	 * Check whether a file or directory exists.
@@ -141,6 +140,7 @@ class filesystem {
 	bool mount(const std::string& archive, const std::string& mountpoint, bool appendToPath);
 	bool mount(const std::string& archive, const std::string& mountpoint);
 	bool mount(const char *archive, const std::string& mountpoint);
+	bool mount(const void *data, unsigned int size, const std::string& mountpoint);
 
 	/**
 	 * Gets the path to the designated save directory.
