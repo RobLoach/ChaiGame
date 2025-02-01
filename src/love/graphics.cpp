@@ -1,11 +1,6 @@
 #include "graphics.h"
 
-#include <SDL.h>
-#include <SDL_gfxPrimitives.h>
-#include <SDL_gfxBlitFunc.h>
-#include <SDL_rotozoom.h>
 #include "../ChaiLove.h"
-#include "../LibretroLog.h"
 #include "Types/Graphics/Image.h"
 #include "Types/Graphics/Font.h"
 #include "Types/Graphics/Color.h"
@@ -22,34 +17,33 @@ graphics::graphics() {
 	setFont();
 }
 
-SDL_Surface* graphics::getScreen() {
-	if (ChaiLove::hasInstance()) {
-		return ChaiLove::getInstance()->screen;
+pntr_image* graphics::getScreen() {
+	if (m_app != NULL) {
+		return m_app->screen;
 	}
 	return NULL;
 }
 
-bool graphics::load() {
-	// Enable alpha blending.
-	if (ChaiLove::getInstance()->config.options["alphablending"]) {
-		if (SDL_SetAlpha(getScreen(), SDL_SRCALPHA, 0) == -1) {
-			LibretroLog::log(RETRO_LOG_ERROR) << "[ChaiLove] Enabling alpha blending failed" << std::endl;
-		}
-	}
-
+bool graphics::load(pntr_app* app) {
 	// Set the default font.
 	graphics::setFont();
+
+	// Match the default colors of Love2D
+	color_back = pntr_new_color(0, 0, 0, 255); // Black
+	color_front = pntr_new_color(255, 255, 255, 255); // White
+
+	m_app = app;
+
 	return true;
 }
 
 graphics& graphics::clear() {
-	return clear(backR, backG, backB, backA);
+	pntr_clear_background(getScreen(), color_back);
+	return *this;
 }
 
 graphics& graphics::clear(int r, int g, int b, int a) {
-	SDL_Surface* screen = getScreen();
-	Uint32 color = SDL_MapRGBA(screen->format, r, g, b, a);
-	SDL_FillRect(screen, NULL, color);
+	pntr_clear_background(getScreen(), pntr_new_color(r, g, b, a));
 	return *this;
 }
 
@@ -58,7 +52,7 @@ graphics& graphics::clear(int r, int g, int b) {
 }
 
 graphics& graphics::point(int x, int y) {
-	pixelRGBA(getScreen(), x, y, r, g, b, a);
+	pntr_draw_point(getScreen(), x, y, color_front);
 	return *this;
 }
 
@@ -83,16 +77,16 @@ void graphics::points(std::vector<Point> points) {
 
 graphics& graphics::rectangle(const std::string& drawmode, int x, int y, int width, int height) {
 	if (drawmode == "line") {
-		rectangleRGBA(getScreen(), x, y, x + width, y + height, r, g, b, a);
+		pntr_draw_rectangle(getScreen(), x, y, width, height, color_front);
 	} else {
-		boxRGBA(getScreen(), x, y, x + width, y + height, r, g, b, a);
+		pntr_draw_rectangle_fill(getScreen(), x, y, width, height, color_front);
 	}
 
 	return *this;
 }
 
 graphics& graphics::line(int x1, int y1, int x2, int y2) {
-	lineRGBA(getScreen(), x1, y1, x2, y2, r, g, b, a);
+	pntr_draw_line(getScreen(), x1, y1, x2, y2, color_front);
 	return *this;
 }
 
@@ -102,10 +96,7 @@ graphics& graphics::draw(Image* image) {
 
 graphics& graphics::draw(Image* image, int x, int y) {
 	if (image && image->loaded()) {
-		SDL_Rect dstrect;
-		dstrect.x = x;
-		dstrect.y = y;
-		SDL_BlitSurface(image->surface, NULL, getScreen(), &dstrect);
+		pntr_draw_image(getScreen(), image->surface, x, y);
 	}
 
 	return *this;
@@ -117,32 +108,43 @@ graphics& graphics::draw(Image* image, Quad quad) {
 
 graphics& graphics::draw(Image* image, Quad quad, int x, int y) {
 	if (image && image->loaded()) {
-		SDL_Rect dest;
-		dest.x = x;
-		dest.y = y;
-		dest.w = x + quad.width;
-		dest.h = y + quad.height;
-		SDL_Rect src = quad.toRect();
-		SDL_BlitSurface(image->surface, &src, getScreen(), &dest);
+		pntr_rectangle srcRect;
+		srcRect.x = quad.x;
+		srcRect.y = quad.x;
+		srcRect.width = quad.sw;
+		srcRect.height = quad.sh;
+		pntr_draw_image_rec(getScreen(), image->surface, quad.toRect(), x, y);
 	}
 
 	return *this;
 }
 
 graphics& graphics::draw(Image* image, int x, int y, float r, float sx, float sy, float ox, float oy) {
-	if (image && image->loaded()) {
-		ChaiLove* app = ChaiLove::getInstance();
-		float angle = app->math.degrees(r);
-		SDL_Surface* tempSurface = rotozoomSurfaceXY(image->surface, angle, sx, sy, m_smooth);
-		if (tempSurface) {
-			float aspectX = ox / image->getWidth();
-			float aspectY = oy / image->getHeight();
-			SDL_Rect dstrect;
-			dstrect.x = x - aspectX * tempSurface->w;
-			dstrect.y = y - aspectY * tempSurface->h;
-			SDL_BlitSurface(tempSurface, NULL, getScreen(), &dstrect);
-			SDL_FreeSurface(tempSurface);
-		}
+	if (image == NULL) {
+		return *this;
+	}
+
+	if (!image->loaded()) {
+		return *this;
+	}
+
+	// TODO: Implement proper rotozoomSurfaceXY
+	if (r == 0.0f) {
+		pntr_draw_image_scaled(getScreen(), image->surface, x, y, sx, sy, ox, oy, m_smooth);
+		return *this;
+	}
+
+	if (sx == 1.0f && sy == 1.0f) {
+		ChaiLove* chailove = ChaiLove::getInstance();
+		pntr_draw_image_rotated(getScreen(), image->surface, x, y, chailove->math.degrees(r), ox, oy, m_smooth);
+		return *this;
+	}
+
+	pntr_image* scaled = pntr_image_scale(image->surface, sx, sy, m_smooth);
+	if (scaled != NULL) {
+		ChaiLove* chailove = ChaiLove::getInstance();
+		pntr_draw_image_rotated(getScreen(), scaled, x, y, chailove->math.degrees(r), ox, oy, m_smooth);
+		pntr_unload_image(scaled);
 	}
 
 	return *this;
@@ -177,20 +179,17 @@ Quad graphics::newQuad(int x, int y, int width, int height, int sw, int sh) {
 }
 
 graphics& graphics::print(const std::string& text) {
-	activeFont->print(text, 0, 0, r, g, b, a);
+	activeFont->print(text, 0, 0, color_front);
 	return *this;
 }
 
 graphics& graphics::print(const std::string& text, int x, int y) {
-	activeFont->print(text, x, y, r, g, b, a);
+	activeFont->print(text, x, y, color_front);
 	return *this;
 }
 
 graphics& graphics::setColor(int red, int green, int blue, int alpha) {
-	r = red;
-	g = green;
-	b = blue;
-	a = alpha;
+	color_front = pntr_new_color(red, green, blue, alpha);
 	return *this;
 }
 
@@ -199,26 +198,17 @@ graphics& graphics::setColor(int red, int green, int blue) {
 }
 
 Color graphics::getColor() {
-	return Color(r, g, b, a);
+	return color_front;
 }
 
 Color graphics::getBackgroundColor() {
-	Color c;
-	c.r = backR;
-	c.g = backG;
-	c.b = backB;
-	c.a = backA;
-	return c;
+	return color_back;
 }
 graphics& graphics::setBackgroundColor(int red, int green, int blue) {
 	return setBackgroundColor(red, green, blue, 255);
 }
 graphics& graphics::setBackgroundColor(int red, int green, int blue, int alpha) {
-	backR = red;
-	backG = green;
-	backB = blue;
-	backA = alpha;
-
+	color_back = pntr_new_color(red, green, blue, alpha);
 	return *this;
 }
 
@@ -227,9 +217,9 @@ graphics& graphics::setBackgroundColor(int red, int green, int blue, int alpha) 
  */
 graphics& graphics::setDefaultFilter(const std::string& filter) {
 	if (filter == "linear") {
-		m_smooth = 1;
+		m_smooth = PNTR_FILTER_BILINEAR;
 	} else if (filter == "nearest") {
-		m_smooth = 0;
+		m_smooth = PNTR_FILTER_NEARESTNEIGHBOR;
 	}
 
 	return *this;
@@ -240,9 +230,9 @@ graphics& graphics::setDefaultFilter(const std::string& filter) {
  */
 std::string graphics::getDefaultFilter() {
 	switch (m_smooth) {
-		case 0:
+		case PNTR_FILTER_NEARESTNEIGHBOR:
 			return "nearest";
-		case 1:
+		case PNTR_FILTER_BILINEAR:
 			return "linear";
 	}
 
@@ -251,10 +241,10 @@ std::string graphics::getDefaultFilter() {
 
 
 int graphics::getWidth() {
-	return getScreen()->w;
+	return pntr_app_width(m_app);
 }
 int graphics::getHeight() {
-	return getScreen()->h;
+	return pntr_app_height(m_app);
 }
 
 Point graphics::getDimensions() {
@@ -263,9 +253,9 @@ Point graphics::getDimensions() {
 
 graphics& graphics::circle(const std::string& drawmode, int x, int y, int radius) {
 	if (drawmode == "line") {
-		circleRGBA(getScreen(), x, y, radius, r, g, b, a);
+		pntr_draw_circle(getScreen(), x, y, radius, color_front);
 	} else {
-		filledCircleRGBA(getScreen(), x, y, radius, r, g, b, a);
+		pntr_draw_circle_fill(getScreen(), x, y, radius, color_front);
 	}
 
 	return *this;
@@ -273,9 +263,9 @@ graphics& graphics::circle(const std::string& drawmode, int x, int y, int radius
 
 graphics& graphics::arc(const std::string& drawmode, int x, int y, int radius, int angle1, int angle2) {
 	if (drawmode == "line") {
-		arcRGBA(getScreen(), x, y, radius, angle1, angle2, r, g, b, a);
+		pntr_draw_arc(getScreen(), x, y, radius, angle1, angle2, radius * 2, color_front);
 	} else {
-		filledPieRGBA(getScreen(), x, y, radius, angle1, angle2, r, g, b, a);
+		pntr_draw_arc_fill(getScreen(), x, y, radius, angle1, angle2, radius * 2, color_front);
 	}
 
 	return *this;
@@ -283,32 +273,68 @@ graphics& graphics::arc(const std::string& drawmode, int x, int y, int radius, i
 
 graphics& graphics::ellipse(const std::string& drawmode, int x, int y, int radiusx, int radiusy) {
 	if (drawmode == "line") {
-		ellipseRGBA(getScreen(), x, y, radiusx, radiusy, r, g, b, a);
+		pntr_draw_ellipse(getScreen(), x, y, radiusx, radiusy, color_front);
 	} else {
-		filledEllipseRGBA(getScreen(), x, y, radiusx, radiusy, r, g, b, a);
+		pntr_draw_ellipse_fill(getScreen(), x, y, radiusx, radiusy, color_front);
 	}
 
 	return *this;
 }
 
 Font* graphics::newFont(const std::string& filename, int glyphWidth, int glyphHeight, const std::string& letters) {
-	return new Font(filename, glyphWidth, glyphHeight, letters);
+	Font* font = new Font(filename, glyphWidth, glyphHeight, letters);
+	if (font->loaded()) {
+		return font;
+	}
+
+	delete font;
+	return NULL;
 }
 
 Font* graphics::newFont(const std::string& filename, int size) {
-	return new Font(filename, size);
-}
+	Font* font = new Font(filename, size);
+	if (font->loaded()) {
+		return font;
+	}
 
-Font* graphics::newFont() {
-	return new Font();
+	delete font;
+	return NULL;
 }
 
 Font* graphics::newFont(const std::string& filename) {
-	return newFont(filename, 12);
+	Font* font = new Font(filename, 16);
+	if (font->loaded()) {
+		return font;
+	}
+
+	delete font;
+	return NULL;
+}
+
+Font* graphics::newFont() {
+	Font* font = new Font();
+	if (font->loaded()) {
+		return font;
+	}
+
+	delete font;
+	return NULL;
+}
+
+Font* graphics::newFont(int size) {
+	Font* font = new Font(size);
+	if (font->loaded()) {
+		return font;
+	}
+
+	delete font;
+	return NULL;
 }
 
 graphics& graphics::setFont(Font* font) {
-	activeFont = font;
+	if (font != NULL) {
+		activeFont = font;
+	}
 	return *this;
 }
 

@@ -4,6 +4,7 @@
 #include <string>
 #include <list>
 #include "config.h"
+#include "Types/Input/Joystick.h"
 
 #ifdef __HAVE_CHAISCRIPT__
 #include <chaiscript/chaiscript.hpp>
@@ -11,6 +12,8 @@
 // TODO(RobLoach): Fix Chai loading with the Standard Library.
 // #include <chaiscript/chaiscript_stdlib.hpp>
 #endif
+
+using love::Types::Input::Joystick;
 
 namespace love {
 
@@ -51,9 +54,6 @@ class script {
 	 *
 	 * @code
 	 * def conf(t) {
-	 *   // Attach a development console, toggle with `.
-	 *   t.console = false
-	 *
 	 *   // The ChaiLove version this game was made for.
 	 *   t.version = "0.29.0"
 	 *
@@ -164,7 +164,7 @@ class script {
 	/**
 	 * Called when a joystick button is pressed.
 	 *
-	 * @param joystick The joystick number.
+	 * @param joystick The joystick object.
 	 * @param button The name of which button was released.
 	 *
 	 * ### Example
@@ -176,19 +176,19 @@ class script {
 	 *   love.graphics.print("Button Pressed: " + buttonPressed, 100, 100)
 	 * }
 	 *
-	 * def joystickpressed(joy, button) {
+	 * def gamepadpressed(joy, button) {
 	 *   buttonPressed = button
 	 * }
 	 * @endcode
 	 *
-	 * @see joystickreleased
+	 * @see gamepadreleased
 	 */
-	void joystickpressed(int joystick, const std::string& button);
+	void gamepadpressed(Joystick* joystick, const std::string& button);
 
 	/**
 	 * Called when a joystick button is released.
 	 *
-	 * @param joystick The joystick number.
+	 * @param joystick The joystick object.
 	 * @param button The name of which button was released.
 	 *
 	 * ### Example
@@ -200,14 +200,34 @@ class script {
 	 *   love.graphics.print("Button Released: " + buttonReleased, 100, 100)
 	 * }
 	 *
-	 * def joystickreleased(joy, button) {
+	 * def gamepadreleased(joy, button) {
 	 *   buttonReleased = button
 	 * }
 	 * @endcode
 	 *
+	 * @see gamepadpressed
+	 */
+	void gamepadreleased(Joystick* joystick, const std::string& button);
+
+	/**
+	 * Called when a joystick button is pressed.
+	 *
+	 * @param joystick The joystick object.
+	 * @param button The number representing the button that was released.
+	 *
+	 * @see joystickreleased
+	 */
+	void joystickpressed(Joystick* joystick, int button);
+
+	/**
+	 * Called when a joystick button is released.
+	 *
+	 * @param joystick The joystick object.
+	 * @param button The number representing the button that was pushed.
+	 *
 	 * @see joystickpressed
 	 */
-	void joystickreleased(int joystick, const std::string& button);
+	void joystickreleased(Joystick* joystick, int button);
 
 	/**
 	 * Called when a mouse button is pressed.
@@ -293,6 +313,7 @@ class script {
 	 * @endcode
 	 */
 	void mousemoved(int x, int y, int dx, int dy);
+	void wheelmoved(int x, int y);
 
 	/**
 	 * Called when a key on the keyboard has been pressed.
@@ -445,20 +466,26 @@ class script {
 	std::function<void()> chaicheatreset;
 	std::function<bool(const std::string&)> chailoadstate;
 	std::function<std::string()> chaisavestate;
-	std::function<void(int, const std::string&)> chaijoystickpressed;
-	std::function<void(int, const std::string&)> chaijoystickreleased;
+	std::function<void(Joystick*, const std::string&)> chaigamepadpressed;
+	std::function<void(Joystick*, const std::string&)> chaigamepadreleased;
+	std::function<void(Joystick*, int)> chaijoystickpressed;
+	std::function<void(Joystick*, int)> chaijoystickreleased;
 	std::function<void(int, int, const std::string&)> chaimousepressed;
 	std::function<void(int, int, const std::string&)> chaimousereleased;
 	std::function<void(int, int, int, int)> chaimousemoved;
+	std::function<void(int, int)> chaiwheelmoved;
 	std::function<void(const std::string&, int)> chaikeypressed;
 	std::function<void(const std::string&, int)> chaikeyreleased;
 	bool hasUpdate = true;
 	bool hasDraw = true;
-	bool hasjoystickpressed = true;
+	bool hasgamepadpressed = true;
+	bool hasgamepadreleased = true;
 	bool hasjoystickreleased = true;
+	bool hasjoystickpressed = true;
 	bool hasmousepressed = true;
 	bool hasmousereleased = true;
 	bool hasmousemoved = true;
+	bool haswheelmoved = true;
 	bool haskeypressed = true;
 	bool haskeyreleased = true;
 	bool hasexit = true;

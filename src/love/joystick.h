@@ -5,7 +5,7 @@
 #include <vector>
 
 #include "Types/Input/Joystick.h"
-#include "SDL.h"
+#include "pntr_app.h"
 
 using love::Types::Input::Joystick;
 
@@ -17,8 +17,7 @@ namespace love {
 class joystick {
 	public:
 	~joystick();
-	void load();
-	void update();
+	void load(pntr_app* app);
 
 	/**
 	 * Gets a list of connected Joysticks.
@@ -87,6 +86,7 @@ class joystick {
 
 	private:
 	std::vector<Joystick*> m_joysticks;
+	pntr_app* m_app;
 };
 
 }  // namespace love

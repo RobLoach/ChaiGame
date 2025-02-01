@@ -5,6 +5,8 @@
 #include "Types/Graphics/Point.h"
 #include "libretro.h"
 
+#include "pntr_app.h"
+
 namespace love {
 
 /**
@@ -12,7 +14,7 @@ namespace love {
  */
 class mouse {
 	public:
-	bool load();
+	bool load(pntr_app* app);
 
 	/**
 	 * Returns the current x-position of the mouse.
@@ -21,7 +23,7 @@ class mouse {
 	 *
 	 * @see love.mouse.getY
 	 */
-	int getX();
+	float getX();
 
 	/**
 	 * Returns the current y-position of the mouse.
@@ -30,7 +32,7 @@ class mouse {
 	 *
 	 * @see love.mouse.getX
 	 */
-	int getY();
+	float getY();
 
 	/**
 	 * Returns the current position of the mouse.
@@ -58,17 +60,15 @@ class mouse {
 	 */
 	bool isDown(const std::string& button);
 
-	void update();
-
 	int getButtonKey(const std::string& button);
 	std::string getButtonName(int button);
-
-	int16_t m_x, m_y;
-	int16_t m_buttonState[RETRO_DEVICE_ID_MOUSE_BUTTON_5];
 
 	void mousemoved(int x, int y, int dx, int dy);
 	void mousepressed(int x, int y, const std::string& button);
 	void mousereleased(int x, int y, const std::string& button);
+	void wheelmoved(int x, int y);
+
+	pntr_app* m_app;
 };
 
 }  // namespace love

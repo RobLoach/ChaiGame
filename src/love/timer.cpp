@@ -2,30 +2,21 @@
 
 namespace love {
 
-timer::timer() {
+void timer::load(pntr_app* app) {
 	// Nothing.
+	m_app = app;
 }
 
 float timer::getDelta() {
-	return m_delta;
+	return pntr_app_delta_time(m_app);
 }
 
 float timer::step(float delta) {
-	m_delta = delta;
-	m_deltaCounter += delta;
-	m_frameCounter++;
-
-	if (m_deltaCounter >= 1.0f) {
-		m_fps = m_frameCounter;
-		m_frameCounter = 0;
-		m_deltaCounter = 0;
-	}
-
-	return m_delta;
+	return delta;
 }
 
 int timer::getFPS() {
-	return m_fps;
+	return pntr_app_fps(m_app);
 }
 
 }  // namespace love

@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include "config.h"
+#include "pntr_app.h"
 
 /**
  * This covers all the modules available through ChaiLove.
@@ -127,7 +128,6 @@ class system {
 
 	bool load(config& t);
 
-	std::string m_clipboardtext;
 	std::string m_username;
 	bool m_usernameInitialized = false;
 };

@@ -73,3 +73,18 @@
 	url = https://github.com/RobLoach/physfs.git
 	ignore = dirty
 	branch = libretro-support
+[submodule "vendor/pntr"]
+	path = vendor/pntr
+	url = https://github.com/RobLoach/pntr.git
+	ignore = dirty
+	branch = master
+[submodule "vendor/pntr_app"]
+	path = vendor/pntr_app
+	url = https://github.com/RobLoach/pntr_app.git
+	ignore = dirty
+	branch = master
+[submodule "vendor/pntr_physfs"]
+	path = vendor/pntr_physfs
+	url = https://github.com/RobLoach/pntr_physfs.git
+	ignore = dirty
+	branch = master

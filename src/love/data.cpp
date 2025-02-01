@@ -11,7 +11,7 @@
 #include "TinySHA1.hpp"
 #include <cppcodec/base64_default_rfc4648.hpp>
 #include <cppcodec/hex_default_lower.hpp>
-#include "../LibretroLog.h"
+#include "pntr_app.h"
 
 namespace love {
 
@@ -27,7 +27,7 @@ std::string data::compress(const std::string& str, int compressionlevel) {
 	memset(&zs, 0, sizeof(zs));
 
 	if (deflateInit(&zs, compressionlevel) != Z_OK) {
-		LibretroLog::log(RETRO_LOG_ERROR) << "[ChaiLove] [data] deflateInit failed while compressing." << std::endl;
+		pntr_app_log(PNTR_APP_LOG_ERROR, "[ChaiLove] [data] deflateInit failed while compressing.");
 		return str;
 	}
 
@@ -53,7 +53,7 @@ std::string data::compress(const std::string& str, int compressionlevel) {
 	deflateEnd(&zs);
 
 	if (ret != Z_STREAM_END) {
-		LibretroLog::log(RETRO_LOG_ERROR) << "[ChaiLove] [data] Exception during zlib compression: (" << ret << ") " << zs.msg << std::endl;
+		pntr_app_log_ex(PNTR_APP_LOG_ERROR, "[ChaiLove] [data] deflateInit failed: %s", zs.msg);
 		return str;
 	}
 
@@ -108,7 +108,7 @@ std::string data::encode(const std::string& containerType, const std::string& fo
 		return encoded;
 	}
 
-	LibretroLog::log(RETRO_LOG_ERROR) << "[ChaiLove] Warning: love.data.encode format not found: " << format << "." << std::endl;
+	pntr_app_log_ex(PNTR_APP_LOG_ERROR, "[ChaiLove]Warning: love.data.encode format not found: %s", format.c_str());
 	return sourceString;
 }
 
@@ -125,7 +125,7 @@ std::string data::decode(const std::string& containerType, const std::string& fo
 		return decoded;
 	}
 
-	LibretroLog::log(RETRO_LOG_ERROR) << "[ChaiLove] Warning: love.data.decode format not found: " << format << "." << std::endl;
+	pntr_app_log_ex(PNTR_APP_LOG_ERROR, "[ChaiLove]Warning: love.data.decode format not found: %s", format.c_str());
 	return sourceString;
 }
 
@@ -138,7 +138,7 @@ std::string data::hash(const std::string& hashFunction, const std::string& data)
 		return hash_sha1(data);
 	}
 
-	LibretroLog::log(RETRO_LOG_ERROR) << "[ChaiLove] Error: Hash function not found: " << hashFunction << "." << std::endl;
+	pntr_app_log_ex(PNTR_APP_LOG_ERROR, "[ChaiLove] Error: Hash function not found: %s", hashFunction.c_str());
 	return "";
 }
 

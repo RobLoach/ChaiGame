@@ -1,6 +1,8 @@
 #ifndef SRC_LOVE_TIMER_H_
 #define SRC_LOVE_TIMER_H_
 
+#include "pntr_app.h"
+
 namespace love {
 
 /**
@@ -8,7 +10,7 @@ namespace love {
  */
 class timer {
 	public:
-	timer();
+	void load(pntr_app* app);
 	float step(float delta);
 
 	/**
@@ -29,11 +31,7 @@ class timer {
 	 * @endcode
 	 */
 	int getFPS();
-
-	float m_delta = 0.0f;
-	float m_deltaCounter = 0.0f;
-	int m_frameCounter = 0;
-	int m_fps = 0;
+	pntr_app* m_app;
 };
 
 }  // namespace love

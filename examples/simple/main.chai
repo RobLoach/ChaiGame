@@ -11,7 +11,8 @@ def load() {
 }
 
 def draw() {
-    love.graphics.print("Congrats! You created your first ChaiLove application!", 200, 300)
+    love.graphics.print("Congrats!", 170, 150)
+	love.graphics.print("You created your first ChaiLove application!", 30, 170)
     love.graphics.draw(logo, x, y)
 }
 

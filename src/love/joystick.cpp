@@ -1,5 +1,5 @@
 #include "joystick.h"
-#include "SDL.h"
+#include "pntr_app.h"
 #include <string>
 #include <vector>
 #include <libretro.h>
@@ -19,10 +19,11 @@ std::vector<Joystick*>& joystick::getJoysticks() {
 	return m_joysticks;
 }
 
-void joystick::load() {
+void joystick::load(pntr_app* app) {
+	m_app = app;
 	int numberOfJoysticks = 4;
 	for (int i = 0; i < numberOfJoysticks; i++) {
-		Joystick* joystick = new Joystick(i);
+		Joystick* joystick = new Joystick(app, i);
 		m_joysticks.push_back(joystick);
 	}
 }
@@ -48,113 +49,87 @@ bool joystick::isDown(int joystick, const std::string& button) {
 	return m_joysticks[joystick]->isDown(button);
 }
 
-void joystick::update() {
-	// Ignore Joypad input when the console is shown.
-	if (ChaiLove::getInstance()->console.isShown()) {
-		return;
-	}
-
-	for (std::vector<Joystick*>::iterator it = m_joysticks.begin(); it != m_joysticks.end(); ++it) {
-		(*it)->update();
-	}
-}
-
 Joystick* joystick::operator[](int joystick) {
-	if (joystick < 0) {
-		joystick = 0;
-	} else if (joystick >= getJoystickCount()) {
-		joystick = getJoystickCount() - 1;
+	if (joystick < 0 || joystick >= getJoystickCount()) {
+		return NULL;
 	}
+
 	return m_joysticks[joystick];
 }
 
 std::string joystick::getButtonName(int key) {
 	switch (key) {
-		case RETRO_DEVICE_ID_JOYPAD_A:
+		case PNTR_APP_GAMEPAD_BUTTON_A:
 			return "a";
-		case RETRO_DEVICE_ID_JOYPAD_B:
+		case PNTR_APP_GAMEPAD_BUTTON_B:
 			return "b";
-		case RETRO_DEVICE_ID_JOYPAD_X:
+		case PNTR_APP_GAMEPAD_BUTTON_X:
 			return "x";
-		case RETRO_DEVICE_ID_JOYPAD_Y:
+		case PNTR_APP_GAMEPAD_BUTTON_Y:
 			return "y";
-		case RETRO_DEVICE_ID_JOYPAD_SELECT:
-			return "select";
-		case RETRO_DEVICE_ID_JOYPAD_START:
+		case PNTR_APP_GAMEPAD_BUTTON_SELECT:
+			return "back";
+		case PNTR_APP_GAMEPAD_BUTTON_START:
 			return "start";
-		case RETRO_DEVICE_ID_JOYPAD_L:
-			return "l1";
-		case RETRO_DEVICE_ID_JOYPAD_R:
-			return "r1";
-		case RETRO_DEVICE_ID_JOYPAD_L2:
-			return "l2";
-		case RETRO_DEVICE_ID_JOYPAD_R2:
-			return "r2";
-		case RETRO_DEVICE_ID_JOYPAD_L3:
-			return "l3";
-		case RETRO_DEVICE_ID_JOYPAD_R3:
-			return "r3";
-		case RETRO_DEVICE_ID_JOYPAD_UP:
-			return "up";
-		case RETRO_DEVICE_ID_JOYPAD_DOWN:
-			return "down";
-		case RETRO_DEVICE_ID_JOYPAD_LEFT:
-			return "left";
-		case RETRO_DEVICE_ID_JOYPAD_RIGHT:
-			return "right";
+		case PNTR_APP_GAMEPAD_BUTTON_LEFT_SHOULDER:
+			return "leftshoulder";
+		case PNTR_APP_GAMEPAD_BUTTON_RIGHT_SHOULDER:
+			return "rightshoulder";
+		case PNTR_APP_GAMEPAD_BUTTON_MENU:
+			return "guide";
+		case PNTR_APP_GAMEPAD_BUTTON_UP:
+			return "dpup";
+		case PNTR_APP_GAMEPAD_BUTTON_DOWN:
+			return "dpdown";
+		case PNTR_APP_GAMEPAD_BUTTON_LEFT:
+			return "dpleft";
+		case PNTR_APP_GAMEPAD_BUTTON_RIGHT:
+			return "dpright";
 	}
 
 	return "unknown";
 }
 
 int joystick::getButtonKey(const std::string& name) {
+	// TODO: Build a pair map of the buttons so this is faster
 	if (name == "a") {
-		return RETRO_DEVICE_ID_JOYPAD_A;
+		return PNTR_APP_GAMEPAD_BUTTON_A;
 	}
 	if (name == "b") {
-		return RETRO_DEVICE_ID_JOYPAD_B;
+		return PNTR_APP_GAMEPAD_BUTTON_B;
 	}
 	if (name == "x") {
-		return RETRO_DEVICE_ID_JOYPAD_X;
+		return PNTR_APP_GAMEPAD_BUTTON_X;
 	}
 	if (name == "y") {
-		return RETRO_DEVICE_ID_JOYPAD_Y;
+		return PNTR_APP_GAMEPAD_BUTTON_Y;
 	}
 	if (name == "select" || name == "back") {
-		return RETRO_DEVICE_ID_JOYPAD_SELECT;
+		return PNTR_APP_GAMEPAD_BUTTON_SELECT;
 	}
 	if (name == "start") {
-		return RETRO_DEVICE_ID_JOYPAD_START;
+		return PNTR_APP_GAMEPAD_BUTTON_START;
+	}
+	if (name == "guide") {
+		return PNTR_APP_GAMEPAD_BUTTON_MENU;
 	}
 	if (name == "l1" || name == "leftshoulder") {
-		return RETRO_DEVICE_ID_JOYPAD_L;
+		return PNTR_APP_GAMEPAD_BUTTON_LEFT_SHOULDER;
 	}
 	if (name == "r1" || name == "rightshoulder") {
-		return RETRO_DEVICE_ID_JOYPAD_R;
-	}
-	if (name == "l2") {
-		return RETRO_DEVICE_ID_JOYPAD_L2;
-	}
-	if (name == "r2") {
-		return RETRO_DEVICE_ID_JOYPAD_R2;
-	}
-	if (name == "l3") {
-		return RETRO_DEVICE_ID_JOYPAD_L3;
-	}
-	if (name == "r3") {
-		return RETRO_DEVICE_ID_JOYPAD_R3;
+		return PNTR_APP_GAMEPAD_BUTTON_RIGHT_SHOULDER;
 	}
 	if (name == "up" || name == "dpup") {
-		return RETRO_DEVICE_ID_JOYPAD_UP;
+		return PNTR_APP_GAMEPAD_BUTTON_UP;
 	}
 	if (name == "down" || name == "dpdown") {
-		return RETRO_DEVICE_ID_JOYPAD_DOWN;
+		return PNTR_APP_GAMEPAD_BUTTON_DOWN;
 	}
 	if (name == "left" || name == "dpleft") {
-		return RETRO_DEVICE_ID_JOYPAD_LEFT;
+		return PNTR_APP_GAMEPAD_BUTTON_LEFT;
 	}
-	if (name == "right" || name == "dpriht") {
-		return RETRO_DEVICE_ID_JOYPAD_RIGHT;
+	if (name == "right" || name == "dpright") {
+		return PNTR_APP_GAMEPAD_BUTTON_RIGHT;
 	}
 	return -1;
 }
